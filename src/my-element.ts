@@ -87,20 +87,19 @@ export class MyElement extends LitElement {
     this.index = index
 
     if(newsObject[index].videoGen === 'yes'){
-      this.videoBool = true
       this.filename = newsObject[index].oneaudio
+      this.videoBool = true
     }
     else if (newsObject[index].videoGen === 'no'){this.videoBool = false}
 
-    if(newsObject[index].audioGen === 'yes'){
-      this.addNewsBool = false
-    }
+    if(newsObject[index].audioGen === 'yes'){this.addNewsBool = false}
     else if (newsObject[index].audioGen === 'no'){this.addNewsBool = true}
-
   }
 
   async audioGen (index, id) {
   
+    this.addNewsBool = false
+
     const url = 'http://localhost:8588/getjson'
     const res = await fetch(url)
     const contentJson = await res.json()
@@ -109,13 +108,14 @@ export class MyElement extends LitElement {
   
     if (newsObject[objectInd].audioGen === 'yes') { alert('Audio Already Generated') } else {
       alert('Audio Generation started')
-      const xhttp = new XMLHttpRequest()
-      xhttp.onload = function () {
-        alert(this.responseText)
-      }
-      xhttp.open('POST', 'http://localhost:8588/generateaudio')
-      xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-      xhttp.send(`ind=${index}`)
+      const data = {"ind":index}
+      const sendreq = await fetch ('http://localhost:8588/generateaudio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      const response = await sendreq.text()
+      alert(response)
     }
   }
 
@@ -125,18 +125,21 @@ export class MyElement extends LitElement {
     const contentJson = await res.json()
     const newsObject = contentJson.newsObject
     const objectInd = index
-  
+   
+
     if (newsObject[objectInd].videoGen === 'yes') { alert('Video Already Generated') } else if (newsObject[objectInd].audioGen === 'no') { alert('Audio is not yet Generated') } else {
+      
+      this.filename = `${newsObject[index].oneaudio}.mp4`
       alert('Video Generation started')
-      const xhttp = new XMLHttpRequest()
-      xhttp.onload = function () {
-        alert(this.responseText)
-        this.videoBool = true
-        this.filename = newsObject[index].oneaudio
-      }
-      xhttp.open('POST', 'http://localhost:8588/generatevideo')
-      xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-      xhttp.send(`ind=${index}`)
+      const data = {"ind":index}
+      const sendreq = await fetch ('http://localhost:8588/generatevideo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      const response = await sendreq.text()
+      alert(response)
+      this.videoBool =true
     }
   }
 
@@ -149,20 +152,49 @@ export class MyElement extends LitElement {
   
     if (newsObject[objectInd].postVideo === 'yes') { alert('Video Already Posted') } else if (newsObject[objectInd].videoGen === 'no') { alert('Video is not yet Generated') } else {
       alert('Video Posting started')
-      const xhttp = new XMLHttpRequest()
-      xhttp.onload = function () {
-        alert(this.responseText)
-      }
-      xhttp.open('POST', 'http://localhost:8588/postvideo')
-      xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-      xhttp.send(`ind=${index}`)
+      const data = {"ind":index}
+      const sendreq = await fetch ('http://localhost:8588/postvideo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      const response = await sendreq.text()
+      alert(response)
     }
   }
 
-  async addNews(index){
+  async addNews(ind){
 
-    const text = document.querySelector(input).value
-      alert(index,text)
+    const getNews = this.shadowRoot.querySelector('INPUT').value
+    this.shadowRoot.querySelector('INPUT').value = ''
+
+    const url = 'http://localhost:8588/getjson'
+    const res = await fetch(url)
+    const contentJson = await res.json()
+    const newsObject = contentJson.newsObject
+    const objectInd = ind
+    const newsDet = newsObject[objectInd].newsDet
+    const newsId = newsObject[objectInd].newsId
+    const index = newsDet.length
+
+    const date = new Date().toString().replace(/[{(+)}]|GMT|0530|India Standard Time| /g, '')
+    const fileName = 'voice/NewsId:' + newsId + '-index:' + index + '-' + date + '.wav'
+
+    const detail = {}
+    detail.text = getNews
+    detail.audio = fileName
+    newsDet[index] = detail
+
+    this.newsDet = newsDet
+  
+    const sendreq = await fetch ('http://localhost:8588/updatejson', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      body: JSON.stringify(contentJson)
+    })
+    const response = await sendreq.text()
+    alert(response)
+   
   }
 
   render() {
@@ -193,7 +225,7 @@ export class MyElement extends LitElement {
             <button class="text font2 tc${this.webid}" @click="${() => this.audioGen(this.index,this.webid)}" >Generate Audio</button>
             <button class="text font2 tc${this.webid}" @click="${() => this.videoGen(this.index)}" >Generate Video</button>
             <button class="text font2 tc${this.webid}" @click="${() => this.postVideo(this.index)}" >Post Video</button>
-           
+            
             ${this.videoBool ? 
               html`
               <h2 class="subhead" >The Generated Video</h2>

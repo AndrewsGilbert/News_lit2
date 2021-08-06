@@ -120,4 +120,9 @@ h1 {
     background-color: #e47215;
   }
 
-  `
+  .none{
+    display:none;
+  }
+  .show{
+    display:block;
+  }`
