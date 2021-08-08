@@ -3,9 +3,8 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { styleSheet } from '../src/styles.js';
 
-
-@customElement('starting-text')
-export class MyElement extends LitElement {
+@customElement('container-')
+export class Container extends LitElement {
 
   static get styles(){
     return styleSheet;
@@ -198,159 +197,123 @@ export class MyElement extends LitElement {
   }
 
   headerTemplate(){
-
     return html`
-
-      ${!this.loadbool ? 
-
-      html`
-
       <h1>News Mission</h1>
-
       <h2 class="head">Welcome to News Misson</h2>
-
       <button class="button newsclick" @click="${this.front}">Click here for select the website to view the Headline News</button><br><br>
-    `:''}
   `;}
 
-  newsWebsitBbuttonTemplate(){
-
+  newsWebsiteTemplate(){
     return html`
-
-    ${this.clickweb && !this.loadbool ? this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.display(x.id)}" >${x.name}</button>`):''}
-
+    ${this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.display(x.id)}" >${x.name}</button>`)}
   `;}
 
   newsContentTemplate(){
-
     return html`
-
-    ${this.newsbutclick && this.clickweb && !this.loadbool ? 
-        html `
-        <h2 class="subhead" >The News from ${this.webname}</h2>
-        <div class="ntext">
-        <ul>
-        ${this.newsDet.map(y => html`<li>${y.text}</li><br>`)}
-        </ul>
-        </div>
-    `:''}
+      <h2 class="subhead" >The News from ${this.webname}</h2>
+      <div class="ntext">
+      <ul>
+      ${this.newsDet.map(y => html`<li>${y.text}</li><br>`)}
+      </ul>
+      </div>
   `;}
 
   addNewsTemplate(){
-
     return html`
-
-    ${this.newsbutclick && this.clickweb && this.addNewsBool ?
-        html `
-        <input class="addnewsinput" type="text" >
-        <button class="text font2 tc${this.webid}" @click="${() => this.addNews(this.index)}" >Add News</button><br> 
-    `:''}
-  `;}
+      <input class="addnewsinput" type="text" >
+      <button class="text font2 tc${this.webid}" @click="${() => this.addNews(this.index)}" >Add News</button><br> 
+ `;}
 
   nextProcessTemplate(){
-
     return html`
-
-    ${this.newsbutclick && this.clickweb && !this.loadbool ?
-
-       html`
       <button class="text font2 tc${this.webid}" @click="${() => this.audioGen(this.index)}" >Generate Audio</button>
       <button class="text font2 tc${this.webid}" @click="${() => this.videoGen(this.index)}" >Generate Video</button>
       <button class="text font2 tc${this.webid}" @click="${() => this.postVideo(this.index)}" >Post Video</button>
-    `:''}
   `;}
 
   videoDiplayTemplate(){
-
     return html`
-
-      ${this.newsbutclick && this.clickweb && !this.loadbool && this.videoBool ? 
-        html`
-        <h2 class="subhead" >The Generated Video</h2>
-        <video controls="controls" type="video/mp4" class="video" src="http://localhost:8588/${this.filename}" ></video>
-      `:''}
+      <h2 class="subhead" >The Generated Video</h2>
+      <video controls="controls" type="video/mp4" class="video" src="http://localhost:8588/${this.filename}" ></video>
   `;}
 
   loadingTemplate(){
-
     return html`
-
-    ${this.loadbool ? 
-      html`
-      <img class="load" src="../src/load.gif">
-    `:''}
+    <img class="load" src="../src/load.gif">
   `;}
 
   render(){
-
     return html`
 
-    ${(this.headerTemplate())}
-    ${(this.newsWebsitBbuttonTemplate())}
-    ${(this.newsContentTemplate())}
-    ${(this.addNewsTemplate())}
-    ${(this.nextProcessTemplate())}
-    ${(this.videoDiplayTemplate())}
-    ${(this.loadingTemplate())}
+    ${!this.loadbool ?
+      html`
+
+      <header->
+      ${(this.headerTemplate())}
+      </header->
+
+      ${this.clickweb ?
+        html`
+
+        <news-details>
+
+        <website-name>
+        ${(this.newsWebsiteTemplate())}
+        </website-name>
+
+        ${this.newsbutclick ?
+          html`
+
+          <news-content>
+          ${(this.newsContentTemplate())}
+          </news-content>
+
+          ${this.addNewsBool ?
+           html`
+
+            <add-news>
+            ${(this.addNewsTemplate())}
+            </add-news>
+          `:''} 
+
+          <next-process>
+          ${(this.nextProcessTemplate())}
+          </next-process>
+
+
+          ${this.videoBool ?
+            html`
+
+            <video-tag>
+            ${(this.videoDiplayTemplate())}
+            </video-tag>
+          `:''} 
+        `:''} 
+
+        </news-details>
+      `:''} 
+    `:''} 
+    
+    ${this.loadbool ?
+        html`
+        ${(this.loadingTemplate())}
+    `:''}
     
     `;
   }
 }
 
 
-
 declare global {
   interface HTMLElementTagNameMap {
-    'starting-text': MyElement;
-
+    'container-': Container;
+    'header-': Header;
+    'news-details' : NewsDetails ;
+    'website-name' : WebsiteName ;
+    'news-content' : NewsContent ;
+    'add-news' : AddNews ;
+    'next-process' : NextProcess ;
+    'video-tag': VideoTag ;
   }
 }
 
-
-//   render() {
-//     return html`
-
-//       ${!this.loadbool ? 
-
-//           html`
-
-//           <h1>News Mission</h1>
-
-//           <h2 class="head">Welcome to News Misson</h2>
-
-//           <button class="button newsclick" @click="${this.front}">Click here for select the website to view the Headline News</button><br><br>
-
-//           ${this.clickweb ? this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.display(x.id)}" >${x.name}</button>`):''}
-
-//           ${this.newsbutclick && this.clickweb ? 
-//               html `
-//               <h2 class="subhead" >The News from ${this.webname}</h2>
-//               <div class="ntext">
-//               <ul>
-//               ${this.newsDet.map(y => html`<li>${y.text}</li><br>`)}
-//               </ul>
-//               </div>
-
-//               ${this.addNewsBool ?
-//               html `
-//               <input class="addnewsinput" type="text" >
-//               <button class="text font2 tc${this.webid}" @click="${() => this.addNews(this.index)}" >Add News</button><br> 
-//               `:''}
-
-//               <button class="text font2 tc${this.webid}" @click="${() => this.audioGen(this.index)}" >Generate Audio</button>
-//               <button class="text font2 tc${this.webid}" @click="${() => this.videoGen(this.index)}" >Generate Video</button>
-//               <button class="text font2 tc${this.webid}" @click="${() => this.postVideo(this.index)}" >Post Video</button>
-                    
-//               ${this.videoBool ? 
-//               html`
-//               <h2 class="subhead" >The Generated Video</h2>
-//               <video controls="controls" type="video/mp4" class="video" src="http://localhost:8588/${this.filename}" ></video>
-//               `:''}
-//           `:''}
-//      `:''}
-
-//       ${this.loadbool ? 
-//          html`
-//          <img class="load" src="../src/load.gif">
-//       `:''}
-//   `;}
