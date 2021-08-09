@@ -48,9 +48,9 @@ export class Container extends LitElement {
 
   @property({type:Boolean})
   loadbool = false
-             
-  async front(){
 
+  async front(){
+ 
     this.clickweb = !this.clickweb
     if(this.clickweb === true ){
       await this.fetchfunction('http://localhost:8588/getjson', {})
@@ -200,12 +200,12 @@ export class Container extends LitElement {
     return html`
       <h1>News Mission</h1>
       <h2 class="head">Welcome to News Misson</h2>
-      <button class="button newsclick" @click="${this.front}">Click here for select the website to view the Headline News</button><br><br>
+      <button class="button newsclick" @click="${() => this.customEvent(['header-', 'showWebsiteName'])}" >Click here for select the website to view the Headline News</button><br><br>
   `;}
 
   newsWebsiteTemplate(){
     return html`
-    ${this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.display(x.id)}" >${x.name}</button>`)}
+    ${this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.customEvent(['news-details', `showNews${x.id}`])}"  >${x.name}</button>`)}
   `;}
 
   newsContentTemplate(){
@@ -221,14 +221,14 @@ export class Container extends LitElement {
   addNewsTemplate(){
     return html`
       <input class="addnewsinput" type="text" >
-      <button class="text font2 tc${this.webid}" @click="${() => this.addNews(this.index)}" >Add News</button><br> 
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['website-name', 'addNews'])}" >Add News</button><br> 
  `;}
 
   nextProcessTemplate(){
     return html`
-      <button class="text font2 tc${this.webid}" @click="${() => this.audioGen(this.index)}" >Generate Audio</button>
-      <button class="text font2 tc${this.webid}" @click="${() => this.videoGen(this.index)}" >Generate Video</button>
-      <button class="text font2 tc${this.webid}" @click="${() => this.postVideo(this.index)}" >Post Video</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'audioGen'])}" >Generate Audio</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'videoGen'])}" >Generate Video</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'postVideo'])}" >Post Video</button>
   `;}
 
   videoDiplayTemplate(){
@@ -248,23 +248,23 @@ export class Container extends LitElement {
     ${!this.loadbool ?
       html`
 
-      <header->
+      <header- @showWebsiteName="${this.front}">
       ${(this.headerTemplate())}
       </header->
 
       ${this.clickweb ?
         html`
 
-        <news-details>
+        <news-details @showNews1="${() => this.display(1)}" @showNews2="${() => this.display(2)}" @showNews3="${() => this.display(3)}" >
 
-        <website-name>
+        <website-name @addNews="${() => this.addNews(this.index)}"  >
         ${(this.newsWebsiteTemplate())}
         </website-name>
 
         ${this.newsbutclick ?
           html`
 
-          <news-content>
+          <news-content @audioGen="${() => this.audioGen(this.index)}" @videoGen="${() => this.videoGen(this.index)}" @postVideo="${() => this.postVideo(this.index)}" >
           ${(this.newsContentTemplate())}
           </news-content>
 
@@ -301,19 +301,30 @@ export class Container extends LitElement {
     
     `;
   }
+
+  customEvent(a: Array<String>) {
+    console.log(1)
+    const myEvent = new CustomEvent(`${a[1]}`, { 
+      detail: { message: 'my-event happened.' }
+    });
+    this.shadowRoot.querySelector(`${a[0]}`).dispatchEvent(myEvent);
+    console.log(3)
+  }
 }
+
+
 
 
 declare global {
   interface HTMLElementTagNameMap {
     'container-': Container;
-    'header-': Header;
-    'news-details' : NewsDetails ;
-    'website-name' : WebsiteName ;
-    'news-content' : NewsContent ;
-    'add-news' : AddNews ;
-    'next-process' : NextProcess ;
-    'video-tag': VideoTag ;
+    'header-': HTMLElement;
+    'news-details': HTMLElement ;
+    'website-name': HTMLElement ;
+    'news-content': HTMLElement ;
+    'add-news': HTMLElement ;
+    'next-process': HTMLElement ;
+    'video-tag': HTMLElement ;
   }
 }
 
