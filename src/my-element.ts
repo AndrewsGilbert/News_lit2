@@ -200,12 +200,12 @@ export class Container extends LitElement {
     return html`
       <h1>News Mission</h1>
       <h2 class="head">Welcome to News Misson</h2>
-      <button class="button newsclick" @click="${() => this.customEvent(['header-', 'showWebsiteName'])}" >Click here for select the website to view the Headline News</button><br><br>
+      <button class="button newsclick" @click="${() => this.customEvent(['.newsclick', 'showWebsiteName'])}" @showWebsiteName="${this.front}">Click here for select the website to view the Headline News</button><br><br>
   `;}
 
   newsWebsiteTemplate(){
     return html`
-    ${this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.customEvent(['news-details', `showNews${x.id}`])}"  >${x.name}</button>`)}
+    ${this.web.map( x => html ` <button class="button nbd${x.id}" @click="${() => this.customEvent([`.nbd${x.id}`, 'showNews'])}" @showNews="${() => this.display(x.id)}"  >${x.name}</button>`)}
   `;}
 
   newsContentTemplate(){
@@ -221,14 +221,14 @@ export class Container extends LitElement {
   addNewsTemplate(){
     return html`
       <input class="addnewsinput" type="text" >
-      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['website-name', 'addNews'])}" >Add News</button><br> 
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['add-news > button', 'addNews'])}"  @addNews="${() => this.addNews(this.index)}"  >Add News</button><br> 
  `;}
 
   nextProcessTemplate(){
     return html`
-      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'audioGen'])}" >Generate Audio</button>
-      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'videoGen'])}" >Generate Video</button>
-      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['news-content', 'postVideo'])}" >Post Video</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['next-process > button:nth-child(1)', 'audioGen'])}" @audioGen="${() => this.audioGen(this.index)}" >Generate Audio</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['next-process > button:nth-child(2)', 'videoGen'])}" @videoGen="${() => this.videoGen(this.index)}" >Generate Video</button>
+      <button class="text font2 tc${this.webid}" @click="${() => this.customEvent(['next-process > button:nth-child(3)', 'postVideo'])}" @postVideo="${() => this.postVideo(this.index)}" >Post Video</button>
   `;}
 
   videoDiplayTemplate(){
@@ -248,23 +248,23 @@ export class Container extends LitElement {
     ${!this.loadbool ?
       html`
 
-      <header- @showWebsiteName="${this.front}">
+      <header->
       ${(this.headerTemplate())}
       </header->
 
       ${this.clickweb ?
         html`
 
-        <news-details @showNews1="${() => this.display(1)}" @showNews2="${() => this.display(2)}" @showNews3="${() => this.display(3)}" >
+        <news-details>
 
-        <website-name @addNews="${() => this.addNews(this.index)}"  >
+        <website-name>
         ${(this.newsWebsiteTemplate())}
         </website-name>
 
         ${this.newsbutclick ?
           html`
 
-          <news-content @audioGen="${() => this.audioGen(this.index)}" @videoGen="${() => this.videoGen(this.index)}" @postVideo="${() => this.postVideo(this.index)}" >
+          <news-content>
           ${(this.newsContentTemplate())}
           </news-content>
 
@@ -328,3 +328,6 @@ declare global {
   }
 }
 
+
+
+//document.querySelector("body > container-").shadowRoot.querySelector("news-details > next-process > button:nth-child(1)")
